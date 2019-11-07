@@ -62,8 +62,8 @@ class IDs(BaseModel):
     random: Random = Schema(...)
 
 
-@app.get('/api/v1/ids')
-@app.post('/api/v1/ids')
+@app.get('/api/v1/ids', tags=['IDs'])
+@app.post('/api/v1/ids', tags=['IDs'])
 async def ids():
     """Returns yours new ids."""
 
