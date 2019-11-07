@@ -15,7 +15,7 @@ ROOT_PAGE = """
 """
 
 
-@app.get('/', responses={200: {'content-type': 'text/html'}}, tags=['Home'])
+@app.get('/', responses={200: {'content-type': 'text/html'}}, include_in_schema=False)
 def root():
     """\
     Returns home page.
