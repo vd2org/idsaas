@@ -1,0 +1,18 @@
+version: "3.7"
+
+networks:
+  service:
+
+services:
+
+  api:
+    build:
+      context: ./
+      dockerfile: Dockerfile.local
+    ports:
+      - "127.0.0.1:80:8080"
+    volumes:
+      - ${PWD}/app:/app
+    networks:
+      - service
+    restart: unless-stopped

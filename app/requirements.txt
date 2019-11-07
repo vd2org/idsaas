@@ -1,0 +1,4 @@
+fastapi==0.42
+uvicorn==0.10
+email-validator==1.0
+ujson==1.35

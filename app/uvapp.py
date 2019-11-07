@@ -16,16 +16,3 @@ app = FastAPI(
 async def startup():
     # TODO: Load vars
     pass
-
-
-@app.get('/')
-async def root():
-    # TODO: Root page
-    pass
-
-
-@app.get('/api/v1/ids')
-@app.get('/api/v1/ids')
-async def ids():
-    # TODO: Return values
-    pass

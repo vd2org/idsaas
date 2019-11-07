@@ -3,3 +3,11 @@
 # IDsaaS is released under the MIT License (see LICENSE).
 
 
+from datetime import datetime
+
+
+class data:
+    counter: int = 0
+    daily: int = 0
+    hourly: int = 0
+    minutely: int = 0
