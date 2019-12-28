@@ -4,7 +4,7 @@
 
 from starlette.responses import Response
 
-from uvapp import app
+from .app import app
 
 ROOT_PAGE = """
 <html>
