@@ -1,0 +1,15 @@
+FROM python:3.7-alpine
+
+COPY app/requirements.txt /
+
+RUN apk update && \
+    apk add --no-cache ca-certificates alpine-sdk && \
+    pip install -r /requirements.txt --no-use-pep517 --no-cache-dir -q --compile && \
+    apk del alpine-sdk && \
+    rm -rf /var/cache/apk/*
+
+COPY app/ /app/
+
+EXPOSE 8080
+
+WORKDIR /app

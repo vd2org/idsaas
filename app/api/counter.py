@@ -17,6 +17,8 @@ class Counters:
 
 
 class data:
+    host: str = None
+    port: int = 8888
     reader: asyncio.StreamReader = None
     writer: asyncio.StreamWriter = None
 
@@ -24,7 +26,7 @@ class data:
 async def get_counters() -> Counters:
     try:
         if not data.reader or not data.writer:
-            data.reader, data.writer = await asyncio.open_connection('127.0.0.1', 8888)
+            data.reader, data.writer = await asyncio.open_connection(data.host, data.port)
 
         data.writer.write(b'\n')
         await data.writer.drain()

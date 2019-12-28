@@ -1,0 +1,64 @@
+version: "3.7"
+
+networks:
+  service:
+
+services:
+  traefik:
+    image: "traefik:2.0"
+    labels:
+      - traefik.http.middlewares.cors.headers.accessControlAllowMethods=GET,POST,PUT,OPTIONS
+      - traefik.http.middlewares.cors.headers.accessControlAllowOrigin=origin-list-or-null
+      - traefik.http.middlewares.cors.headers.accessControlMaxAge=240
+      - traefik.http.middlewares.cors.headers.accessControlAllowHeaders=Content-Type,authorization
+      - traefik.http.middlewares.cors.headers.addVaryHeader=true
+    command:
+      - "--providers.docker=true"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "127.0.0.1:80:80"
+    networks:
+      - service
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./
+      dockerfile: Dockerfile.local
+    labels:
+      - traefik.http.routers.api.rule=PathPrefix(`/`)
+      - traefik.http.routers.api.middlewares=cors@docker
+      - traefik.http.services.api.loadbalancer.server.port=8080
+    environment:
+      - COUNTER_HOST=counter
+    volumes:
+      - ${PWD}/app:/app
+    networks:
+      - service
+    command:
+      - "uvicorn"
+      - "api:app"
+      - "--host"
+      - "0.0.0.0"
+      - "--port"
+      - "8080"
+      - "--reload"
+    restart: unless-stopped
+
+  counter:
+    build:
+      context: ./
+      dockerfile: Dockerfile.local
+    environment:
+      - FILE=/data/counters.p
+    volumes:
+      - ${PWD}/.data:/data
+      - ${PWD}/app:/app
+    networks:
+      - service
+    command:
+      - "python"
+      - "-m"
+      - "counter"
+    restart: unless-stopped

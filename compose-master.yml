@@ -1,0 +1,80 @@
+version: "3.7"
+
+networks:
+  service:
+    name: service
+
+services:
+  traefik:
+    image: "traefik:2.0"
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.network=service"
+      - "--providers.docker.exposedByDefault=false"
+      - "--entryPoints.web.address=:80"
+      - "--entryPoints.websecure.address=:443"
+      - "--certificatesResolvers.letsencrypt.acme.dnsChallenge=true"
+      - "--certificatesResolvers.letsencrypt.acme.dnsChallenge.provider=cloudflare"
+      - "--certificatesResolvers.letsencrypt.acme.email=${CF_EMAIL:?You need to add an key CF_EMAIL!}"
+      - "--certificatesResolvers.letsencrypt.acme.storage=/etc/traefik/acme/acme.json"
+    environment:
+      - CF_ZONE_API_TOKEN=${CF_ZONE_API_TOKEN:?You need to add an authentication key CF_ZONE_API_TOKEN!}
+      - CF_DNS_API_TOKEN=${CF_DNS_API_TOKEN:?You need to add an authentication key CF_DNS_API_TOKEN!}
+    volumes:
+      - /opt/acme:/etc/traefik/acme
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - service
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./
+      dockerfile: Dockerfile.master
+    labels:
+      - traefik.enable=true
+      - traefik.http.middlewares.cors.headers.accessControlAllowMethods=GET,POST,PUT,OPTIONS
+      - traefik.http.middlewares.cors.headers.accessControlAllowOrigin=origin-list-or-null
+      - traefik.http.middlewares.cors.headers.accessControlMaxAge=240
+      - traefik.http.middlewares.cors.headers.accessControlAllowHeaders=Content-Type,authorization
+      - traefik.http.middlewares.cors.headers.addVaryHeader=true
+      - traefik.http.routers.api.entrypoints=websecure
+      - traefik.http.routers.api.rule=PathPrefix(`/`)
+      - traefik.http.routers.api.middlewares=cors@docker
+      - traefik.http.routers.api.tls.certresolver=letsencrypt
+      - traefik.http.services.api.loadbalancer.server.port=8080
+    environment:
+      - PYTHONOPTIMIZE=true
+      - COUNTER_HOST=counter
+    networks:
+      - service
+    command:
+      - "uvicorn"
+      - "api:app"
+      - "--host"
+      - "0.0.0.0"
+      - "--port"
+      - "8080"
+      - "--workers"
+      - "3"
+    restart: unless-stopped
+
+  counter:
+    build:
+      context: ./
+      dockerfile: Dockerfile.master
+    environment:
+      - PYTHONOPTIMIZE=true
+      - FILE=/data/counters.p
+    volumes:
+      - /opt/idsaas-data/counter:/data
+    networks:
+      - service
+    command:
+      - "python"
+      - "-m"
+      - "counter"
+    restart: unless-stopped
