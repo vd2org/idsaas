@@ -10,9 +10,3 @@ app = FastAPI(
     description="ISs as a Service.",
     version="edge",
 )
-
-
-@app.on_event('startup')
-async def startup():
-    # TODO: Load vars
-    pass

@@ -3,6 +3,8 @@
 # IDsaaS is released under the MIT License (see LICENSE).
 
 
+import asyncio
+import logging
 import uuid
 from datetime import datetime
 from secrets import token_urlsafe, token_hex, randbelow, randbits
@@ -10,7 +12,9 @@ from secrets import token_urlsafe, token_hex, randbelow, randbits
 from pydantic import BaseModel, Schema
 
 from .app import app
-from .data import data
+from .counter import get_counters
+
+logger = logging.getLogger('api.ids')
 
 DEFAULT_UUID_NAMESPACE = uuid.UUID('00000000-0000-0000-0000-000000000000')
 TOKENS_SIZE = 32
@@ -20,10 +24,10 @@ MAX_48BIT = 281_474_976_710_655
 
 
 class Counters(BaseModel):
-    counter: int = Schema(..., example=1024, title="Overall unique counter")
-    daily: int = Schema(..., example=128, title="Daily unique counter")
-    hourly: int = Schema(..., example=64, title="Hourly unique counter")
-    minutely: int = Schema(..., example=2, title="Minutely unique counter")
+    counter: str = Schema(..., example="1024", title="Overall unique counter")
+    daily: str = Schema(..., example="128", title="Daily unique counter")
+    hourly: str = Schema(..., example="64", title="Hourly unique counter")
+    minutely: str = Schema(..., example="2", title="Minutely unique counter")
 
 
 class UUIDs(BaseModel):
@@ -86,18 +90,18 @@ async def ids_post(params: RequestParams = None) -> IDs:
 async def ids(params: RequestParams) -> IDs:
     """Returns yours new IDs."""
 
-    # TODO!!!
-    # Process counters
-    data.counter += 1
-    data.daily += 1
-    data.hourly += 1
-    data.minutely += 1
+    try:
+        cnt = await get_counters()
+    except ConnectionError:
+        logger.warning('Reconnecting to counter service...')
+        await asyncio.sleep(0.01)
+        cnt = await get_counters()
 
     counters = Counters(
-        counter=data.counter,
-        daily=data.daily,
-        hourly=data.hourly,
-        minutely=data.minutely,
+        counter=cnt.counter,
+        daily=cnt.daily,
+        hourly=cnt.hourly,
+        minutely=cnt.minutely,
     )
 
     uuids = UUIDs(
