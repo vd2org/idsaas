@@ -9,7 +9,7 @@ import uuid
 from datetime import datetime
 from secrets import token_urlsafe, token_hex, randbelow, randbits
 
-from pydantic import BaseModel, Schema
+from pydantic import BaseModel, Field
 
 from .app import app
 from .counter import get_counters
@@ -24,57 +24,57 @@ MAX_48BIT = 281_474_976_710_655
 
 
 class Counters(BaseModel):
-    counter: str = Schema(..., example="1024", title="Overall unique counter")
-    daily: str = Schema(..., example="128", title="Daily unique counter")
-    hourly: str = Schema(..., example="64", title="Hourly unique counter")
-    minutely: str = Schema(..., example="2", title="Minutely unique counter")
+    counter: str = Field(..., example="1024", title="Overall unique counter")
+    daily: str = Field(..., example="128", title="Daily unique counter")
+    hourly: str = Field(..., example="64", title="Hourly unique counter")
+    minutely: str = Field(..., example="2", title="Minutely unique counter")
 
 
 class UUIDs(BaseModel):
-    uuid1: uuid.UUID = Schema(..., example="371abe38-293e-11ea-96ac-0da5d077f224", title="UUID1 with given node")
-    uuid3: uuid.UUID = Schema(..., example="770fdca6-b84c-32e3-8aee-4f7aca5da38a",
-                              title="UUID3 with given namespace and name")
-    uuid4: uuid.UUID = Schema(..., example="4ba1927a-94a6-49b8-aea6-e3ccab22bc4b", title="UUID4 random UUIDs")
-    uuid5: uuid.UUID = Schema(..., example="e297db46-8505-5009-ba39-aa2c8baedbb7",
-                              title="UUID5 with given namespace and name")
+    uuid1: uuid.UUID = Field(..., example="371abe38-293e-11ea-96ac-0da5d077f224", title="UUID1 with given node")
+    uuid3: uuid.UUID = Field(..., example="770fdca6-b84c-32e3-8aee-4f7aca5da38a",
+                             title="UUID3 with given namespace and name")
+    uuid4: uuid.UUID = Field(..., example="4ba1927a-94a6-49b8-aea6-e3ccab22bc4b", title="UUID4 random UUIDs")
+    uuid5: uuid.UUID = Field(..., example="e297db46-8505-5009-ba39-aa2c8baedbb7",
+                             title="UUID5 with given namespace and name")
 
 
 class Time(BaseModel):
-    iso: str = Schema(..., example="2019-12-28T06:49:37.743407", title="DateTime in ISO format")
-    timestamp: int = Schema(..., example=1577508577, title="UNIX timestamp")
-    date: int = Schema(..., example=20191228, title="Date in integer")
-    time: int = Schema(..., example=64937, title="Time in integer")
-    datetime: int = Schema(..., example=20191228064937, title="Date and Time in integer")
-    year: int = Schema(..., example=2019, title="Year in integer")
-    month: int = Schema(..., example=12, title="Month in integer")
-    day: int = Schema(..., example=28, title="Day in integer")
-    hour: int = Schema(..., example=6, title="Hour in integer")
-    minute: int = Schema(..., example=49, title="Minute in integer")
-    second: int = Schema(..., example=37, title="Second in integer")
-    microsecond: int = Schema(..., example=743407, title="Microsecond in integer")
+    iso: str = Field(..., example="2019-12-28T06:49:37.743407", title="DateTime in ISO format")
+    timestamp: int = Field(..., example=1577508577, title="UNIX timestamp")
+    date: int = Field(..., example=20191228, title="Date in integer")
+    time: int = Field(..., example=64937, title="Time in integer")
+    datetime: int = Field(..., example=20191228064937, title="Date and Time in integer")
+    year: int = Field(..., example=2019, title="Year in integer")
+    month: int = Field(..., example=12, title="Month in integer")
+    day: int = Field(..., example=28, title="Day in integer")
+    hour: int = Field(..., example=6, title="Hour in integer")
+    minute: int = Field(..., example=49, title="Minute in integer")
+    second: int = Field(..., example=37, title="Second in integer")
+    microsecond: int = Field(..., example=743407, title="Microsecond in integer")
 
 
 class Random(BaseModel):
-    urlsafe: str = Schema(..., example="H-CjdOii4qIzQtzXEAnOUaIQLw9wxyA0LYafNPrATfs", title="Token usable to URLs")
-    hex: str = Schema(..., example="50d6858ae562e0526c60cd4d66ca011981188ef8927c4de648fa7a614bc21add",
-                      title="Token hex")
-    integer: int = Schema(..., example=33532999, title="Random integer from 0 to given max")
-    bits: str = Schema(..., example="4948411366347323230433518920752968098", title="128 bit random integer")
+    urlsafe: str = Field(..., example="H-CjdOii4qIzQtzXEAnOUaIQLw9wxyA0LYafNPrATfs", title="Token usable to URLs")
+    hex: str = Field(..., example="50d6858ae562e0526c60cd4d66ca011981188ef8927c4de648fa7a614bc21add",
+                     title="Token hex")
+    integer: int = Field(..., example=33532999, title="Random integer from 0 to given max")
+    bits: str = Field(..., example="4948411366347323230433518920752968098", title="128 bit random integer")
 
 
 class IDs(BaseModel):
-    counters: Counters = Schema(...)
-    uuid: UUIDs = Schema(...)
-    time: Time = Schema(...)
-    random: Random = Schema(...)
+    counters: Counters = Field(...)
+    uuid: UUIDs = Field(...)
+    time: Time = Field(...)
+    random: Random = Field(...)
 
 
 class RequestParams(BaseModel):
-    random_max_int: int = Schema(RANDINT, gt=1, le=MAX_48BIT, example=RANDINT, title="Max value for random integer.")
-    uuid_node: int = Schema(None, ge=0, le=MAX_48BIT, example=1024, title="Node for uuid1 generator.")
-    uuid_namespace: uuid.UUID = Schema(DEFAULT_UUID_NAMESPACE, example="2ed65488-204a-3714-ac63-072f63d1e5e1",
-                                       title="Namespace for uuid3 and uuid5 generator.")
-    uuid_name: str = Schema(None, example="idsaas", title="Name for uuid3 and uuid5 generators.")
+    random_max_int: int = Field(RANDINT, gt=1, le=MAX_48BIT, example=RANDINT, title="Max value for random integer.")
+    uuid_node: int = Field(None, ge=0, le=MAX_48BIT, example=1024, title="Node for uuid1 generator.")
+    uuid_namespace: uuid.UUID = Field(DEFAULT_UUID_NAMESPACE, example="2ed65488-204a-3714-ac63-072f63d1e5e1",
+                                      title="Namespace for uuid3 and uuid5 generator.")
+    uuid_name: str = Field(None, example="idsaas", title="Name for uuid3 and uuid5 generators.")
 
 
 @app.get('/api/v1/ids', response_model=IDs, tags=['IDs'])
@@ -98,10 +98,10 @@ async def ids(params: RequestParams) -> IDs:
         cnt = await get_counters()
 
     counters = Counters(
-        counter=cnt.counter,
-        daily=cnt.daily,
-        hourly=cnt.hourly,
-        minutely=cnt.minutely,
+        counter=str(cnt.counter),
+        daily=str(cnt.daily),
+        hourly=str(cnt.hourly),
+        minutely=str(cnt.minutely),
     )
 
     uuids = UUIDs(
@@ -117,7 +117,7 @@ async def ids(params: RequestParams) -> IDs:
 
     time = Time(
         iso=now.isoformat(),
-        timestamp=now.timestamp(),
+        timestamp=int(now.timestamp()),
         date=date,
         time=time,
         datetime=date * 1000000 + time,
@@ -134,7 +134,7 @@ async def ids(params: RequestParams) -> IDs:
         urlsafe=token_urlsafe(TOKENS_SIZE),
         hex=token_hex(TOKENS_SIZE),
         integer=randbelow(params.random_max_int),
-        bits=randbits(RANDBITS_SIZE),
+        bits=str(randbits(RANDBITS_SIZE)),
     )
 
     return IDs(

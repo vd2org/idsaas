@@ -5,12 +5,12 @@ networks:
 
 services:
   traefik:
-    image: "traefik:2.0"
+    image: "traefik:2.9"
     labels:
       - traefik.http.middlewares.cors.headers.accessControlAllowMethods=GET,POST,PUT,OPTIONS
-      - traefik.http.middlewares.cors.headers.accessControlAllowOrigin=origin-list-or-null
-      - traefik.http.middlewares.cors.headers.accessControlMaxAge=240
       - traefik.http.middlewares.cors.headers.accessControlAllowHeaders=Content-Type,authorization
+      - traefik.http.middlewares.cors.headers.accessControlAllowOriginList=*
+      - traefik.http.middlewares.cors.headers.accessControlMaxAge=240
       - traefik.http.middlewares.cors.headers.addVaryHeader=true
     command:
       - "--providers.docker=true"

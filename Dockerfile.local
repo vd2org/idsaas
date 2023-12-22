@@ -1,9 +1,6 @@
-FROM python:3.7-alpine
+FROM python:3.12
 
 COPY app/requirements.txt /
-
-RUN apk update && \
-    apk add --no-cache ca-certificates alpine-sdk
 
 RUN pip install -r /requirements.txt --no-use-pep517 --no-cache-dir -q --compile
 
